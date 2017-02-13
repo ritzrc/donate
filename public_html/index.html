@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Donation Project</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>        
+
+        <!--############################---CSS----START------############################-->
+        <style>
+            html, body {
+                width: 100%;
+                height: 100%;
+                background-color: #888888;
+            }
+            .holder {
+                background-color: #ffffff;
+                padding: 8%;
+                padding-top: 12%;
+                margin-top: 5%;
+                width: 60vh;
+                position: relative;
+            }
+            .progress {
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+                padding: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+            }
+            .cssProgress-bar {
+                display: block;
+                float: left;
+                width: 0%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+                background-color: orange;
+            }
+            .tooltip {
+                position: relative;
+                max-width: 910px;
+                width: 100%;
+            }
+            .tooltip-inner {
+                max-width: 910px;
+                width: 100%;
+                text-align: center;
+                font-size: 2vh;
+            }
+            p {
+                color: #666666;
+            }
+            span {
+                font-weight: bold; 
+            }
+            .orange {
+                color: orange;
+            }
+            .info {
+                margin-top: 0px;                
+                padding: 2vh;
+                padding-top: 0px;
+                box-shadow: 0px 0.4vh 0.4vh -0.1vh #888888;
+            }
+            .form {
+                padding-top: 4vh;
+                padding-bottom: 4vh;
+            }
+            .form .btn-success {
+                border: none;
+                border-radius: 6%; 
+                padding: 1.5vh;
+                font-size: 2vh;
+            }
+            .btn-default {
+                background-color: #fafafa;
+                border-color: #dcdcdc;
+                border-radius: 3%; 
+                padding: 1.5vh;
+                font-size: 2vh;
+            }
+            .currencyinput {
+                border: solid #cccccc 0.3vh;
+                border-radius: 6%; 
+                padding: 1vh;
+                font-size: 2vh;
+                width: 80%;
+                color: #666666;
+                padding-bottom: 0.2vh; /*FOR IE & Chrome*/
+            }
+            .currencyinput input {
+                border: 0;
+                border-radius: 6%; 
+                padding: 1vh;
+                font-size: 2vh;
+                width: 80%;
+                color: #666666;
+                display: inline;
+            }
+            .currencyinput input:focus {
+                outline: 0;
+            }
+        </style>
+        <!--############################------CSS----END------############################-->
+
+    </head>
+    <body>
+        <form id="refresh" action="showrecord.php" method="post" name="refresh" style="display: none;"></form>
+        <div class="container  center-block">
+            <div class="row  center-block">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-3 holder center-block">
+                    <div id="notification" data-toggle="tooltip" data-placement="top" class="progress">                
+                        <div id="bar" class="cssProgress-bar">
+                        </div>
+                    </div>
+                    <div class="info">
+                        <p><span class="orange">Only 3 days left</span> to fund this project.</p>
+                        <p>Join the <span id="donor-no"></span> other donors who have already supported this project.
+                            Every dollar helps.</p>
+                        <form id="form" action="keeprecord.php" method="post" name="donate">
+                            <div class="row form">                        
+                                <div class="col-sm-6">
+                                    <span class="currencyinput center-block">$
+                                        <input type="text"  class="center-block" name="amt" id="amt" placeholder="50"/>
+                                    </span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="submit" class="btn-success center-block" value="Submit" name="donate" id="donate">Give Now</button>
+                                </div>                        
+                            </div>
+                        </form>
+                        <p><i><a href="#">Why give $50?</a></i></p>
+                    </div>
+                    <div class="row form">                        
+                        <div class="col-sm-6">
+                            <button type="button" class="btn-default center-block" id="save">Save for later</button>
+                        </div>
+                        <div class="col-sm-6">
+                            <button type="button" class="btn-default center-block" id="share">Tell your friends</button>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
+        </div>    
+        <!--############################---JS----START------############################-->
+        <script>
+            $(document).ready(function () {
+                //progress handler
+                var query = window.location.search.substring(1);
+                var vars = query.split("&");
+                if (vars.length !== 3 && vars.length !== 2)
+                {
+                    document.getElementById("refresh").submit();
+                }
+                if (vars.length >= 2)
+                {
+                    for (var i = 0; i < vars.length; i++)
+                    {
+                        var pair = vars[i].split("=");
+                        if (pair[0] === "amt")
+                        {
+                            document.getElementById("bar").style.width = pair[1] / 10 + "%";
+                            document.getElementById("notification").title = 1000 - pair[1] + " still needed for this project";
+                        } else if (pair[0] === "no")
+                        {
+                            document.getElementById("donor-no").innerHTML = pair[1];
+                        } else
+                        {
+                            alert(pair[1].replace(new RegExp("%20", 'g'), " "));
+                        }
+                    }
+                }
+                $('[data-toggle=tooltip]').tooltip({trigger: 'manual'}).tooltip('show');
+                //Share Button Handler                
+                $('#share').click(function (e) {
+                    var fbLink = "https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fritrisha.pe.hu%2Fproj_donate%2F&quote=Yay!%20I%20donated!";
+                    var twtLink = "http://twitter.com/share?text=Yay,%20I%20donated!&url=http://http://ritrisha.pe.hu/proj_donate/";
+                    window.open(fbLink);
+                    window.open(twtLink);
+                });
+                //save handler
+                $('#save').click(function (e) {
+                    var bookmarkURL = window.location.href;
+                    var bookmarkTitle = document.title;
+                    if ('addToHomescreen' in window && addToHomescreen.isCompatible) {
+                        // Mobile browsers
+                        addToHomescreen({autostart: false, startDelay: 0}).show(true);
+                        alert("Saved!");
+                    } else if (window.sidebar && window.sidebar.addPanel) {
+                        // Firefox <=22
+                        window.sidebar.addPanel(bookmarkTitle, bookmarkURL, '');
+                        alert("Saved!");
+                    } else if ((window.sidebar && /Firefox/i.test(navigator.userAgent)) || (window.opera && window.print)) {
+                        // Firefox 23+ and Opera <=14
+                        $('#save').attr( 'href' , bookmarkURL);
+                        $('#save').attr( 'title' , bookmarkTitle);
+                        $('#save').attr( 'rel' , 'sidebar');
+                        $('#save').on(e);   
+                        alert("Saved!");                    
+                        return true;
+                    } else if (window.external && ('AddFavorite' in window.external)) {
+                        // IE Favorites
+                        window.external.AddFavorite(bookmarkURL, bookmarkTitle);
+                        alert("Saved!");
+                    } else {
+                        // Other browsers (mainly WebKit & Blink - Safari, Chrome, Opera 15+)
+                        alert('Press ' + (/Mac/i.test(navigator.userAgent) ? 'Cmd' : 'Ctrl') + '+D to bookmark this page.');
+                    }
+                    return false;
+                });
+            });
+        </script>
+        <!--############################------JS----END------############################-->
+    </body>
+</html>
